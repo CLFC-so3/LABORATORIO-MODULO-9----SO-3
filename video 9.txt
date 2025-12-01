@@ -1,0 +1,201 @@
+VIDEO 1 WEBMIN
+
+sudo nano /etc/yum.repos.d/webmin.repo
+
+#############################################
+
+[Webmin]
+name=Webmin Distribution Neutral
+baseurl=http://download.webmin.com/download/yum
+enabled=1
+gpgcheck=1
+gpgkey=http://www.webmin.com/jcameron-key.asc
+
+##############################################
+
+sudo dnf install -y webmin
+sudo systemctl enable webmin
+sudo systemctl start wembin
+sudo systemctl status webmin
+
+
+https://localhost:10000
+https://127.0.0.1:10000
+https://10.0.0.70:10000
+
+
+#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/
+
+
+VIDEO 3 ANSIBLE
+(tanto para windows como para Linux, hacer todo en permisos de administrador)
+
+-Fedora:
+sudo dnf install -y ansible sshpass python3-pip
+ansible --version
+
+
+-Fedora: 
+sudo adduser ansible
+sudo passwd ansible
+sudo usermod -aG wheel ansible
+sudo visudo
+
+###################
+al fondo agregar:
+
+ansible ALL=(ALL) NOPASSWD:ALL
+####################
+
+
+
+-Ubuntu:
+sudo adduser ansible
+sudo passwd ansible
+sudo usermod -aG sudo ansible
+sudo visudo
+
+###################
+al fondo agregar:
+
+ansible ALL=(ALL) NOPASSWD:ALL
+####################
+
+
+
+-Windows:
+net user ansible 1 /add
+net localgroup Administrators ansible /add
+
+-Fedora: 
+su - ansible
+exit
+ssh-keygen -t rsa -b 4096 -C "ansible@controller"
+ssh-copy-id ansible@20.120.227.153
+
+-Windows: 
+winrm quickconfig
+Enable-PSRemoting -Force
+Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
+Set-Item -Path WSMan:\localhost\Service\AllowUnencrypted -Value $true
+
+New-NetFirewallRule -Name "WinRM_TCP_IN"  -DisplayName "WinRM TCP Entrada"  -Protocol TCP -LocalPort 5985 -Direction Inbound  -Action Allow
+New-NetFirewallRule -Name "WinRM_UDP_IN"  -DisplayName "WinRM UDP Entrada"  -Protocol UDP -LocalPort 5985 -Direction Inbound  -Action Allow
+New-NetFirewallRule -Name "WinRM_TCP_OUT" -DisplayName "WinRM TCP Salida"   -Protocol TCP -LocalPort 5985 -Direction Outbound -Action Allow
+New-NetFirewallRule -Name "WinRM_UDP_OUT" -DisplayName "WinRM UDP Salida"   -Protocol UDP -LocalPort 5985 -Direction Outbound -Action Allow
+
+- Fedora:
+
+nano /etc/ansible/hosts
+
+###################################################################################################################################
+
+al fondo agregar
+
+[linux]
+ip_publica_de_maquina_en_la_nube ansible_user=ansible ansible_connection=ssh
+
+[win]
+ip_de_windows ansible_user=ansible ansible_password=1 ansible_connection=winrm ansible_winrm_transport=basic ansible_port=5985
+
+##################################################################################################################################
+
+- Fedora:
+ansible linux -m ping -i /etc/ansible/hosts
+ansible win -m win_ping -i /etc/ansible/hosts
+
+
+#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/
+
+VIDEO 4 AD HOC 
+
+Probar que ansible funciona:
+- Fedora:
+
+ansible linux -m ping -i /etc/ansible/hosts
+ansible win -m win_ping -i /etc/ansible/hosts
+
+COPIAR ARCHIVO DEL ESCRITORIO A LA CARPETA DE DOCUMENTOS:
+ansible win -m win_copy -a 'src=C:\\\\Users\\\\ansible\\\\Desktop\\\\archivo.txt dest=C:\\\\Users\\\\ansible\\\\Documents\\\\archivo.txt remote_src=true' -i /etc/ansible/hosts
+
+
+REINICIAR WINDOWS:
+ansible win -m win_reboot -i /etc/ansible/hosts
+
+
+#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/#/
+
+VIDEO 5 PLAYBOOK
+
+Probar que ansible funciona:
+- Fedora:
+
+ansible linux -m ping -i /etc/ansible/hosts
+ansible win -m win_ping -i /etc/ansible/hosts
+
+INSTALAR NOTEPAD++
+
+nano playbook-notepad.yml
+
+######################################################################################################################################
+agregar adentro:
+
+- name: Instalar Notepad++ en Windows
+  hosts: win
+  gather_facts: false
+  tasks:
+    - name: Descargar instalador
+      win_get_url:
+        url: https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.5.8/npp.8.5.8.Installer.x64.exe
+        dest: C:\Users\ansible\Downloads\npp_installer.exe
+
+    - name: Instalar Notepad++
+      win_package:
+        path: C:\Users\ansible\Downloads\npp_installer.exe
+        arguments: /S
+        product_id: Notepad++
+        state: present
+######################################################################################################################################
+
+ansible-playbook playbook-notepad.yml -i /etc/ansible/hosts
+
+INSTALAR NGINX EN MAQUINA EN LA NUBE E INICIARLO (INCLUYENDO CAMBIARLO DE PUERTO DEL 80 AL 8080)
+
+nano playbook-nginx.yml
+
+######################################################################################################################################
+agregar adentro:
+
+# playbook-nginx.yml
+- name: Instalar y activar NGINX en Ubuntu
+  hosts: linux
+  become: true
+  tasks:
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar NGINX
+      apt:
+        name: nginx
+        state: present
+
+    - name: Iniciar servicio NGINX
+      service:
+        name: nginx
+        state: started
+        enabled: true
+######################################################################################################################################
+
+ansible-playbook playbook-nginx.yml -i /etc/ansible/hosts
+
+
+
+
+
+
+
+
+
+
+
