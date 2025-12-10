@@ -511,9 +511,66 @@ nano playbook-debian.yml
       debug:
         msg: "Usuario carlos creado exitosamente con privilegios de superusuario en sistema Debian/Ubuntu"
 
-#############################################################################################3
+#############################################################################################
+
+nano playbook-windows.yml
+
 ansible-playbook playbook-debian.yml -i /etc/ansible/hosts
 
+nano playbook-windows.yml 
+
+#######################################################################################################
+
+---
+- name: Configurar usuario carlos y instalar Notepad++ (Windows)
+  hosts: win
+  gather_facts: no
+  
+  tasks:
+    - name: Crear usuario carlos en Windows
+      win_user:
+        name: carlos
+        password: "P@ssw0rd123!"
+        state: present
+        groups:
+          - Administradores
+          - Administrators
+        password_never_expires: yes
+        user_cannot_change_password: no
+    
+    - name: Agregar carlos al grupo de Administradores (español)
+      win_group_membership:
+        name: Administradores
+        members:
+          - carlos
+        state: present
+      ignore_errors: yes
+    
+    - name: Agregar carlos al grupo de Administrators (inglés)
+      win_group_membership:
+        name: Administrators
+        members:
+          - carlos
+        state: present
+      ignore_errors: yes
+    
+    - name: Instalar Chocolatey (gestor de paquetes)
+      win_chocolatey:
+        name: chocolatey
+        state: present
+    
+    - name: Instalar Notepad++ usando Chocolatey
+      win_chocolatey:
+        name: notepadplusplus
+        state: present
+    
+    - name: Mostrar información del usuario creado
+      debug:
+        msg: "Usuario carlos creado exitosamente con privilegios de administrador y Notepad++ instalado"
+
+#######################################################################################################
+
+ansible-playbook playbook-windows.yml -i /etc/ansible/hosts
 
 
 
