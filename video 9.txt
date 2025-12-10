@@ -190,10 +190,78 @@ agregar adentro:
 ansible-playbook playbook-nginx.yml -i /etc/ansible/hosts
 
 
+nano playbook-redhat.yml 
 
+#############################################################################################3
+---
+- name: Configurar usuario carlos y instalar bashtop (Red Hat/Fedora)
+  hosts: linux
+  become: yes
+  become_method: sudo
+  
+  tasks:
+    - name: Crear usuario carlos
+      user:
+        name: carlos
+        state: present
+        shell: /bin/bash
+        create_home: yes
+        
+    - name: Agregar carlos al grupo wheel (superusuarios)
+      user:
+        name: carlos
+        groups: wheel
+        append: yes
+    
+    - name: Instalar bashtop usando dnf
+      dnf:
+        name: bashtop
+        state: present
+      
+    - name: Mostrar información del usuario creado
+      debug:
+        msg: "Usuario carlos creado exitosamente con privilegios de superusuario en sistema Red Hat/Fedora"
+#############################################################################################3
+ansible-playbook playbook-redhat.yml -i /etc/ansible/hosts
 
+nano playbook-debian.yml
+#############################################################################################3
+---
+- name: Configurar usuario carlos y instalar bashtop (Debian/Ubuntu)
+  hosts: linux
+  become: yes
+  become_method: sudo
+  
+  tasks:
+    - name: Crear usuario carlos
+      user:
+        name: carlos
+        state: present
+        shell: /bin/bash
+        create_home: yes
+        
+    - name: Agregar carlos al grupo sudo (superusuarios)
+      user:
+        name: carlos
+        groups: sudo
+        append: yes
+    
+    - name: Actualizar caché de apt
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    
+    - name: Instalar bashtop usando apt
+      apt:
+        name: bashtop
+        state: present
+      
+    - name: Mostrar información del usuario creado
+      debug:
+        msg: "Usuario carlos creado exitosamente con privilegios de superusuario en sistema Debian/Ubuntu"
 
-
+#############################################################################################3
+ansible-playbook playbook-debian.yml -i /etc/ansible/hosts
 
 
 
