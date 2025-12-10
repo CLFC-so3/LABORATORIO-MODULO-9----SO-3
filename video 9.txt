@@ -187,6 +187,43 @@ agregar adentro:
         enabled: true
 ######################################################################################################################################
 
+######################################################################################################################################
+
+- name: instalar nginx y cambiarlo de puerto
+  hosts: linux
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Actualizar lista de paquetes
+      apt: 
+       update_cache: yes
+
+    - name: instalar nginx
+      apt: 
+       name: nginx
+       state: present
+
+    - name: cambiar de puerto
+      replace:
+        path: /etc/nginx/sites-available/default
+        regexp: 'listen 80 default_server;'
+        replace: 'listen 8080 default_server;'
+
+    - name: cambiar de puerto ipv6
+      replace:
+        path: /etc/nginx/sites-available/default
+        regexp: 'listen \[::\]:80 default_server;'
+        replace: 'listen [::]:8080 default_server;'
+
+    - name: iniciar servicio nginx
+      service: 
+        name: nginx
+        state: started
+        enabled: true
+
+
+######################################################################################################################################
+
 ansible-playbook playbook-nginx.yml -i /etc/ansible/hosts
 
 
@@ -262,6 +299,7 @@ nano playbook-debian.yml
 
 #############################################################################################3
 ansible-playbook playbook-debian.yml -i /etc/ansible/hosts
+
 
 
 
